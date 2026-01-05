@@ -1,0 +1,98 @@
+[
+  {
+    "name": "울산 HD FC",
+    "playerCount": 35,
+    "avgFantasyScore": 14.5,
+    "totalGoals": 47,
+    "totalAssists": 43,
+    "topPlayer": "김기희"
+  },
+  {
+    "name": "FC서울",
+    "playerCount": 37,
+    "avgFantasyScore": 14.0,
+    "totalGoals": 47,
+    "totalAssists": 40,
+    "topPlayer": "야잔"
+  },
+  {
+    "name": "광주FC",
+    "playerCount": 36,
+    "avgFantasyScore": 13.3,
+    "totalGoals": 32,
+    "totalAssists": 28,
+    "topPlayer": "포포비치"
+  },
+  {
+    "name": "전북 현대 모터스",
+    "playerCount": 43,
+    "avgFantasyScore": 13.2,
+    "totalGoals": 40,
+    "totalAssists": 38,
+    "topPlayer": "페트라섹"
+  },
+  {
+    "name": "대구FC",
+    "playerCount": 30,
+    "avgFantasyScore": 13.2,
+    "totalGoals": 37,
+    "totalAssists": 25,
+    "topPlayer": "카이오"
+  },
+  {
+    "name": "인천 유나이티드",
+    "playerCount": 32,
+    "avgFantasyScore": 12.9,
+    "totalGoals": 26,
+    "totalAssists": 21,
+    "topPlayer": "요니치"
+  },
+  {
+    "name": "대전 하나 시티즌",
+    "playerCount": 46,
+    "avgFantasyScore": 12.9,
+    "totalGoals": 29,
+    "totalAssists": 26,
+    "topPlayer": "김재우"
+  },
+  {
+    "name": "김천 상무 프로축구단",
+    "playerCount": 44,
+    "avgFantasyScore": 12.9,
+    "totalGoals": 41,
+    "totalAssists": 32,
+    "topPlayer": "김봉수"
+  },
+  {
+    "name": "강원FC",
+    "playerCount": 36,
+    "avgFantasyScore": 12.6,
+    "totalGoals": 51,
+    "totalAssists": 42,
+    "topPlayer": "이기혁"
+  },
+  {
+    "name": "수원FC",
+    "playerCount": 35,
+    "avgFantasyScore": 12.4,
+    "totalGoals": 43,
+    "totalAssists": 39,
+    "topPlayer": "권경원"
+  },
+  {
+    "name": "포항 스틸러스",
+    "playerCount": 35,
+    "avgFantasyScore": 12.3,
+    "totalGoals": 43,
+    "totalAssists": 40,
+    "topPlayer": "이동희"
+  },
+  {
+    "name": "제주SK FC",
+    "playerCount": 37,
+    "avgFantasyScore": 12.0,
+    "totalGoals": 26,
+    "totalAssists": 20,
+    "topPlayer": "송주훈"
+  }
+]

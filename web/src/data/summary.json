@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-01-05T12:19:55.477565",
+  "totalPlayers": 446,
+  "totalDarkHorses": 7,
+  "avgPredictedScore": 13.4,
+  "topPredictedPlayer": {
+    "id": 500452,
+    "name": "요니치",
+    "team": "인천 유나이티드",
+    "position": "CB",
+    "predictedScore": 28.2,
+    "recentAvg": 31.1,
+    "seasonAvg": 33.3,
+    "formIndex": 0.93,
+    "matchesPlayed": 27,
+    "totalGoals": 1,
+    "totalAssists": 1,
+    "contributions": {
+      "recentForm": -2.1,
+      "seasonAvg": 35.5,
+      "position": 14.6,
+      "goals": 2,
+      "assists": 1.5
+    },
+    "rank": 1,
+    "positionRank": 1
+  },
+  "topDarkHorse": {
+    "id": 529744,
+    "name": "노경호",
+    "team": "수원FC",
+    "position": "CM",
+    "formSurge": 1.8,
+    "recent3Avg": 23.4,
+    "seasonAvg": 13.0,
+    "matchesPlayed": 8,
+    "reason": "폼 80% 급상승 / 출장 기회 제한적 / 상위 30% 예측",
+    "predictedRank": 122
+  },
+  "positionCounts": {
+    "CB": 82,
+    "CM": 89,
+    "RB": 22,
+    "CF": 69,
+    "LWB": 10,
+    "LB": 22,
+    "LW": 34,
+    "RWB": 10,
+    "RM": 10,
+    "RW": 44,
+    "CAM": 8,
+    "CDM": 1,
+    "null": 5,
+    "LM": 10,
+    "GK": 30
+  }
+}

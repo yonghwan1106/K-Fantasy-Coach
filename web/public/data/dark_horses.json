@@ -1,0 +1,86 @@
+[
+  {
+    "id": 529744,
+    "name": "노경호",
+    "team": "수원FC",
+    "position": "CM",
+    "formSurge": 1.8,
+    "recent3Avg": 23.4,
+    "seasonAvg": 13.0,
+    "matchesPlayed": 8,
+    "reason": "폼 80% 급상승 / 출장 기회 제한적 / 상위 30% 예측",
+    "predictedRank": 122
+  },
+  {
+    "id": 360165,
+    "name": "김경재",
+    "team": "광주FC",
+    "position": "CB",
+    "formSurge": 1.75,
+    "recent3Avg": 25.8,
+    "seasonAvg": 14.7,
+    "matchesPlayed": 7,
+    "reason": "폼 75% 급상승 / 출장 기회 제한적 / 상위 30% 예측",
+    "predictedRank": 118
+  },
+  {
+    "id": 360389,
+    "name": "이강현",
+    "team": "광주FC",
+    "position": "CM",
+    "formSurge": 1.68,
+    "recent3Avg": 18.0,
+    "seasonAvg": 10.7,
+    "matchesPlayed": 11,
+    "reason": "폼 67% 급상승 / 인지도 낮음 / 상위 30% 예측",
+    "predictedRank": 115
+  },
+  {
+    "id": 526909,
+    "name": "박찬용",
+    "team": "김천 상무 프로축구단",
+    "position": "CB",
+    "formSurge": 1.45,
+    "recent3Avg": 26.3,
+    "seasonAvg": 18.2,
+    "matchesPlayed": 8,
+    "reason": "폼 44% 상승 / 출장 기회 제한적 / 상위 15% 예측",
+    "predictedRank": 55
+  },
+  {
+    "id": 246403,
+    "name": "맹성웅",
+    "team": "전북 현대 모터스",
+    "position": "CM",
+    "formSurge": 1.43,
+    "recent3Avg": 20.1,
+    "seasonAvg": 14.0,
+    "matchesPlayed": 7,
+    "reason": "폼 43% 상승 / 출장 기회 제한적 / 상위 30% 예측",
+    "predictedRank": 125
+  },
+  {
+    "id": 529466,
+    "name": "정우영",
+    "team": "울산 HD FC",
+    "position": "CM",
+    "formSurge": 1.42,
+    "recent3Avg": 22.8,
+    "seasonAvg": 16.1,
+    "matchesPlayed": 6,
+    "reason": "폼 42% 상승 / 출장 기회 제한적 / 상위 30% 예측",
+    "predictedRank": 104
+  },
+  {
+    "id": 343586,
+    "name": "김우석",
+    "team": "강원FC",
+    "position": "CB",
+    "formSurge": 1.32,
+    "recent3Avg": 14.7,
+    "seasonAvg": 11.1,
+    "matchesPlayed": 4,
+    "reason": "폼 32% 상승 / 출장 기회 제한적 / 상위 30% 예측",
+    "predictedRank": 123
+  }
+]
