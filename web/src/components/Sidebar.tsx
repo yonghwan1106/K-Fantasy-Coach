@@ -12,18 +12,29 @@ import {
   Star,
   Scale,
   Building2,
+  Calendar,
   Menu,
-  X
+  X,
+  MoreHorizontal
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/', icon: LayoutDashboard, label: '대시보드' },
   { href: '/players', icon: Users, label: '선수 검색' },
+  { href: '/schedule', icon: Calendar, label: '일정/매치업', badge: 'NEW' },
   { href: '/recommend', icon: Sparkles, label: 'AI 추천' },
-  { href: '/compare', icon: Scale, label: '선수 비교', badge: 'NEW' },
+  { href: '/compare', icon: Scale, label: '선수 비교' },
   { href: '/my-team', icon: Trophy, label: '팀 빌더' },
   { href: '/teams', icon: Building2, label: '팀별 선수' },
   { href: '/dark-horse', icon: Zap, label: '다크호스' },
+];
+
+// Bottom tab items for mobile (main 4 + more)
+const mobileTabItems = [
+  { href: '/', icon: LayoutDashboard, label: '홈' },
+  { href: '/players', icon: Users, label: '선수' },
+  { href: '/my-team', icon: Trophy, label: '팀빌더' },
+  { href: '/recommend', icon: Sparkles, label: 'AI추천' },
 ];
 
 export default function Sidebar() {
@@ -133,6 +144,35 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
+
+      {/* Mobile Bottom Tab Bar */}
+      <nav className="mobile-nav lg:hidden flex justify-around items-center">
+        {mobileTabItems.map((item) => {
+          const isActive = pathname === item.href;
+          const Icon = item.icon;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`mobile-nav-item touch-target ${isActive ? 'active' : ''}`}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[10px] font-medium">{item.label}</span>
+            </Link>
+          );
+        })}
+        {/* More Menu Button */}
+        <button
+          onClick={() => setIsOpen(true)}
+          className={`mobile-nav-item touch-target ${
+            !mobileTabItems.some(item => item.href === pathname) ? 'active' : ''
+          }`}
+        >
+          <MoreHorizontal className="w-5 h-5" />
+          <span className="text-[10px] font-medium">더보기</span>
+        </button>
+      </nav>
     </>
   );
 }

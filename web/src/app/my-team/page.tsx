@@ -1,8 +1,12 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Trophy, Users, Plus, X, TrendingUp, Save, FolderOpen, Trash2, Copy, Check, Share2 } from 'lucide-react';
-import { Player, SavedTeam, Formation, getPositionGroup } from '@/types';
+import { Trophy, Users, Plus, X, TrendingUp, Save, FolderOpen, Trash2, Check, Share2, Wallet, AlertTriangle, Sparkles } from 'lucide-react';
+import { Player, SavedTeam, Formation, getPositionGroup, getAvailabilityLabel, getAvailabilityColor } from '@/types';
+import BudgetMeter, { BudgetSelector, BudgetMeterMini } from '@/components/BudgetMeter';
+import { PriceTag, ValueStars } from '@/components/ValueRatingBadge';
+import { enrichPlayersData, filterByBudget, sortByValue } from '@/lib/dataEnricher';
+import { SkeletonFormation, SkeletonStatCard } from '@/components/SkeletonLoader';
 
 const FORMATIONS: Record<Formation, { GK: number; DF: number; MF: number; FW: number }> = {
   '4-3-3': { GK: 1, DF: 4, MF: 3, FW: 3 },
@@ -11,6 +15,7 @@ const FORMATIONS: Record<Formation, { GK: number; DF: number; MF: number; FW: nu
 };
 
 const STORAGE_KEY = 'k-fantasy-saved-teams';
+const BUDGET_OPTIONS = [80, 100, 120];
 
 export default function MyTeamPage() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -18,6 +23,10 @@ export default function MyTeamPage() {
   const [formation, setFormation] = useState<Formation>('4-3-3');
   const [selectedPlayers, setSelectedPlayers] = useState<Record<string, Player | null>>({});
   const [showPicker, setShowPicker] = useState<string | null>(null);
+
+  // 예산 관련 상태
+  const [budget, setBudget] = useState<number>(100);
+  const [sortMode, setSortMode] = useState<'score' | 'price' | 'value'>('score');
 
   // 저장 관련 상태
   const [savedTeams, setSavedTeams] = useState<SavedTeam[]>([]);
@@ -42,7 +51,9 @@ export default function MyTeamPage() {
     fetch('/data/players.json')
       .then(r => r.json())
       .then(data => {
-        setPlayers(data);
+        // 선수 데이터 보강 (가격, 가성비, 출전 정보 추가)
+        const enrichedData = enrichPlayersData(data);
+        setPlayers(enrichedData);
         setLoading(false);
       });
   }, []);
@@ -68,6 +79,22 @@ export default function MyTeamPage() {
       .reduce((sum, p) => sum + (p?.predictedScore || 0), 0);
   }, [selectedPlayers]);
 
+  // 총 비용 계산
+  const totalCost = useMemo(() => {
+    return Object.values(selectedPlayers)
+      .filter(Boolean)
+      .reduce((sum, p) => sum + (p?.price || 0), 0);
+  }, [selectedPlayers]);
+
+  // 남은 예산
+  const remainingBudget = budget - totalCost;
+  const isOverBudget = totalCost > budget;
+
+  // 가성비 (팀 전체)
+  const teamValueRating = useMemo(() => {
+    return totalCost > 0 ? totalScore / totalCost : 0;
+  }, [totalScore, totalCost]);
+
   const selectedCount = Object.values(selectedPlayers).filter(Boolean).length;
 
   const handleSelectPlayer = (slotId: string, player: Player) => {
@@ -79,13 +106,22 @@ export default function MyTeamPage() {
     setSelectedPlayers(prev => ({ ...prev, [slotId]: null }));
   };
 
-  // 선택 가능한 선수 (이미 선택된 선수 제외)
+  // 선택 가능한 선수 (이미 선택된 선수 제외, 예산 필터링 옵션)
   const getAvailablePlayers = (group: 'GK' | 'DF' | 'MF' | 'FW') => {
     const selectedIds = Object.values(selectedPlayers).filter(Boolean).map(p => p!.id);
-    return players
-      .filter(p => getPositionGroup(p.position) === group && !selectedIds.includes(p.id))
-      .sort((a, b) => b.predictedScore - a.predictedScore)
-      .slice(0, 20);
+    let available = players
+      .filter(p => getPositionGroup(p.position) === group && !selectedIds.includes(p.id));
+
+    // 정렬 적용
+    if (sortMode === 'value') {
+      available = sortByValue(available);
+    } else if (sortMode === 'price') {
+      available = [...available].sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else {
+      available = [...available].sort((a, b) => b.predictedScore - a.predictedScore);
+    }
+
+    return available.slice(0, 30);
   };
 
   // 팀 저장
@@ -130,7 +166,7 @@ export default function MyTeamPage() {
       .map(([slotId, p]) => `${slotId}:${p!.id}`)
       .join(',');
 
-    const shareUrl = `${window.location.origin}/my-team?f=${formation}&p=${encodeURIComponent(selectedIds)}`;
+    const shareUrl = `${window.location.origin}/my-team?f=${formation}&b=${budget}&p=${encodeURIComponent(selectedIds)}`;
 
     navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
@@ -145,14 +181,30 @@ export default function MyTeamPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <div className="h-10 w-48 skeleton-shimmer rounded" />
+          <div className="flex gap-2">
+            <div className="h-10 w-16 skeleton-shimmer rounded" />
+            <div className="h-10 w-16 skeleton-shimmer rounded" />
+            <div className="h-10 w-16 skeleton-shimmer rounded" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <SkeletonFormation />
+          </div>
+          <div className="space-y-6">
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-page-enter">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
@@ -163,34 +215,55 @@ export default function MyTeamPage() {
           <p className="text-zinc-400">나만의 드림팀을 구성하고 예상 총점을 확인하세요</p>
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-2 flex-wrap">
-          {/* Formation Selector */}
-          {Object.keys(FORMATIONS).map(f => (
-            <button
-              key={f}
-              onClick={() => {
-                setFormation(f as Formation);
-                setSelectedPlayers({});
-              }}
-              className={`px-4 py-2 rounded-lg font-bold transition-colors ${
-                formation === f
-                  ? 'gradient-gold text-black'
-                  : 'bg-zinc-800 text-zinc-400 hover:text-white'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+        {/* Formation & Budget Selector */}
+        <div className="flex gap-4 flex-wrap items-center">
+          {/* Formation */}
+          <div className="flex gap-2">
+            {Object.keys(FORMATIONS).map(f => (
+              <button
+                key={f}
+                onClick={() => {
+                  setFormation(f as Formation);
+                  setSelectedPlayers({});
+                }}
+                className={`px-4 py-2 rounded-lg font-bold transition-colors ${
+                  formation === f
+                    ? 'gradient-gold text-black'
+                    : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          {/* Budget Selector */}
+          <div className="flex items-center gap-2">
+            <Wallet className="w-5 h-5 text-gold-400" />
+            <BudgetSelector value={budget} onChange={setBudget} options={BUDGET_OPTIONS} />
+          </div>
         </div>
       </div>
+
+      {/* Budget Alert */}
+      {isOverBudget && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center gap-3 animate-bounce-in">
+          <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0" />
+          <div>
+            <p className="font-bold text-red-400">예산 초과!</p>
+            <p className="text-sm text-zinc-400">
+              현재 팀 비용이 예산을 {(totalCost - budget).toFixed(1)}M 초과했습니다. 예산을 늘리거나 선수를 교체하세요.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setShowSaveModal(true)}
           disabled={selectedCount === 0}
-          className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed touch-target"
         >
           <Save className="w-4 h-4" />
           팀 저장
@@ -198,7 +271,7 @@ export default function MyTeamPage() {
         <button
           onClick={() => setShowLoadModal(true)}
           disabled={savedTeams.length === 0}
-          className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed touch-target"
         >
           <FolderOpen className="w-4 h-4" />
           불러오기 ({savedTeams.length})
@@ -206,7 +279,7 @@ export default function MyTeamPage() {
         <button
           onClick={handleShareTeam}
           disabled={selectedCount === 0}
-          className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed touch-target"
         >
           {copied ? <Check className="w-4 h-4 text-green-400" /> : <Share2 className="w-4 h-4" />}
           {copied ? '복사됨!' : '공유'}
@@ -214,7 +287,7 @@ export default function MyTeamPage() {
         <button
           onClick={handleClearTeam}
           disabled={selectedCount === 0}
-          className="bg-zinc-800 text-zinc-400 hover:text-red-400 px-4 py-2 rounded-lg text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="bg-zinc-800 text-zinc-400 hover:text-red-400 px-4 py-2 rounded-lg text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
         >
           <Trash2 className="w-4 h-4" />
           초기화
@@ -224,14 +297,14 @@ export default function MyTeamPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Formation View */}
         <div className="lg:col-span-2">
-          <div className="glass-card p-8 relative" style={{ minHeight: '500px' }}>
+          <div className="glass-card p-4 sm:p-8 relative min-h-[400px] sm:min-h-[500px]">
             {/* 피치 배경 */}
-            <div className="absolute inset-4 bg-gradient-to-b from-green-900/30 to-green-800/20 rounded-xl border border-green-500/20" />
+            <div className="absolute inset-2 sm:inset-4 bg-gradient-to-b from-green-900/30 to-green-800/20 rounded-xl border border-green-500/20" />
 
             {/* 포지션별 슬롯 */}
-            <div className="relative z-10 h-full flex flex-col justify-between py-8">
+            <div className="relative z-10 h-full flex flex-col justify-between py-4 sm:py-8">
               {/* FW */}
-              <div className="flex justify-center gap-8 flex-wrap">
+              <div className="flex justify-center gap-2 sm:gap-8 flex-wrap">
                 {slots.filter(s => s.group === 'FW').map(slot => (
                   <SlotButton
                     key={slot.id}
@@ -239,12 +312,13 @@ export default function MyTeamPage() {
                     player={selectedPlayers[slot.id]}
                     onAdd={() => setShowPicker(slot.id)}
                     onRemove={() => handleRemovePlayer(slot.id)}
+                    showPrice
                   />
                 ))}
               </div>
 
               {/* MF */}
-              <div className="flex justify-center gap-6 flex-wrap">
+              <div className="flex justify-center gap-1.5 sm:gap-6 flex-wrap">
                 {slots.filter(s => s.group === 'MF').map(slot => (
                   <SlotButton
                     key={slot.id}
@@ -252,12 +326,13 @@ export default function MyTeamPage() {
                     player={selectedPlayers[slot.id]}
                     onAdd={() => setShowPicker(slot.id)}
                     onRemove={() => handleRemovePlayer(slot.id)}
+                    showPrice
                   />
                 ))}
               </div>
 
               {/* DF */}
-              <div className="flex justify-center gap-6 flex-wrap">
+              <div className="flex justify-center gap-1.5 sm:gap-6 flex-wrap">
                 {slots.filter(s => s.group === 'DF').map(slot => (
                   <SlotButton
                     key={slot.id}
@@ -265,6 +340,7 @@ export default function MyTeamPage() {
                     player={selectedPlayers[slot.id]}
                     onAdd={() => setShowPicker(slot.id)}
                     onRemove={() => handleRemovePlayer(slot.id)}
+                    showPrice
                   />
                 ))}
               </div>
@@ -278,6 +354,7 @@ export default function MyTeamPage() {
                     player={selectedPlayers[slot.id]}
                     onAdd={() => setShowPicker(slot.id)}
                     onRemove={() => handleRemovePlayer(slot.id)}
+                    showPrice
                   />
                 ))}
               </div>
@@ -287,6 +364,12 @@ export default function MyTeamPage() {
 
         {/* Right: Stats & Picker */}
         <div className="space-y-6">
+          {/* Budget Meter */}
+          <BudgetMeter
+            totalBudget={budget}
+            spentAmount={totalCost}
+          />
+
           {/* Team Stats */}
           <div className="glass-card p-6">
             <h3 className="font-bold text-white mb-4 flex items-center gap-2">
@@ -295,9 +378,23 @@ export default function MyTeamPage() {
             </h3>
 
             <div className="space-y-4">
-              <div className="text-center p-4 bg-zinc-900/50 rounded-xl">
-                <p className="text-4xl font-bold gradient-text">{totalScore.toFixed(1)}</p>
-                <p className="text-sm text-zinc-500">예상 총점</p>
+              <div className="grid grid-cols-2 gap-3">
+                {/* 예상 총점 */}
+                <div className="text-center p-3 bg-zinc-900/50 rounded-xl">
+                  <p className="text-2xl font-bold gradient-text animate-count-up">{totalScore.toFixed(1)}</p>
+                  <p className="text-xs text-zinc-500">예상 총점</p>
+                </div>
+
+                {/* 가성비 */}
+                <div className="text-center p-3 bg-zinc-900/50 rounded-xl">
+                  <div className="flex items-center justify-center gap-1 text-2xl font-bold">
+                    <Sparkles className={`w-5 h-5 ${teamValueRating >= 2.5 ? 'text-green-400' : teamValueRating >= 1.5 ? 'text-yellow-400' : 'text-red-400'}`} />
+                    <span className={teamValueRating >= 2.5 ? 'text-green-400' : teamValueRating >= 1.5 ? 'text-yellow-400' : 'text-red-400'}>
+                      {teamValueRating.toFixed(2)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-500">팀 가성비</p>
+                </div>
               </div>
 
               <div className="flex justify-between text-sm">
@@ -307,7 +404,7 @@ export default function MyTeamPage() {
 
               <div className="stat-bar">
                 <div
-                  className="stat-bar-fill"
+                  className="stat-bar-fill animate-progress"
                   style={{ width: `${(selectedCount / 11) * 100}%` }}
                 />
               </div>
@@ -318,44 +415,98 @@ export default function MyTeamPage() {
                   {selectedCount > 0 ? (totalScore / selectedCount).toFixed(1) : '-'}
                 </span>
               </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-400">평균 가격</span>
+                <span className="text-white">
+                  {selectedCount > 0 ? (totalCost / selectedCount).toFixed(1) + 'M' : '-'}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Player Picker */}
           {showPicker && (
-            <div className="glass-card p-4 max-h-[400px] overflow-y-auto">
+            <div className="glass-card p-4 max-h-[400px] overflow-y-auto animate-scale-in">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-white">선수 선택</h3>
                 <button
                   onClick={() => setShowPicker(null)}
-                  className="text-zinc-400 hover:text-white"
+                  className="text-zinc-400 hover:text-white touch-target"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="space-y-2">
-                {getAvailablePlayers(showPicker.split('-')[0] as 'GK' | 'DF' | 'MF' | 'FW').map(player => (
+              {/* Sort Options */}
+              <div className="flex gap-2 mb-4">
+                {(['score', 'price', 'value'] as const).map(mode => (
                   <button
-                    key={player.id}
-                    onClick={() => handleSelectPlayer(showPicker, player)}
-                    className="w-full p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-left transition-colors"
+                    key={mode}
+                    onClick={() => setSortMode(mode)}
+                    className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                      sortMode === mode
+                        ? 'bg-gold-500 text-black'
+                        : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                    }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-bold text-white">{player.name}</p>
-                        <p className="text-xs text-zinc-500">{player.team} / {player.position}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold gradient-text">{player.predictedScore.toFixed(1)}</p>
-                        <p className="text-xs text-zinc-500 flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3" />
-                          {((player.formIndex - 1) * 100).toFixed(0)}%
-                        </p>
-                      </div>
-                    </div>
+                    {mode === 'score' ? '점수순' : mode === 'price' ? '가격순' : '가성비순'}
                   </button>
                 ))}
+              </div>
+
+              <div className="space-y-2">
+                {getAvailablePlayers(showPicker.split('-')[0] as 'GK' | 'DF' | 'MF' | 'FW').map(player => {
+                  const canAfford = (player.price || 0) <= remainingBudget;
+                  const isUnavailable = player.availability?.status !== 'available' && player.availability?.status !== undefined;
+
+                  return (
+                    <button
+                      key={player.id}
+                      onClick={() => handleSelectPlayer(showPicker, player)}
+                      disabled={!canAfford}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        canAfford
+                          ? 'bg-zinc-800 hover:bg-zinc-700'
+                          : 'bg-zinc-900/50 opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold text-white truncate">{player.name}</p>
+                            {isUnavailable && (
+                              <span
+                                className="text-[10px] px-1.5 py-0.5 rounded"
+                                style={{
+                                  backgroundColor: `${getAvailabilityColor(player.availability!.status)}20`,
+                                  color: getAvailabilityColor(player.availability!.status)
+                                }}
+                              >
+                                {getAvailabilityLabel(player.availability!.status)}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-zinc-500">{player.team} / {player.position}</p>
+                        </div>
+                        <div className="text-right ml-2">
+                          <p className="font-bold gradient-text">{player.predictedScore.toFixed(1)}</p>
+                          <div className="flex items-center justify-end gap-2">
+                            <PriceTag price={player.price || 0} size="sm" />
+                            {player.valueRating && (
+                              <span className="text-[10px] text-zinc-500">
+                                V:{player.valueRating.toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {!canAfford && (
+                        <p className="text-xs text-red-400 mt-1">예산 부족</p>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -369,11 +520,14 @@ export default function MyTeamPage() {
                   .filter(([_, p]) => p)
                   .map(([slotId, player]) => (
                     <div key={slotId} className="flex items-center justify-between p-2 bg-zinc-800/50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-white">{player!.name}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-white truncate">{player!.name}</p>
                         <p className="text-xs text-zinc-500">{player!.position}</p>
                       </div>
-                      <p className="font-bold gradient-text">{player!.predictedScore.toFixed(1)}</p>
+                      <div className="flex items-center gap-2">
+                        <PriceTag price={player!.price || 0} size="sm" />
+                        <p className="font-bold gradient-text">{player!.predictedScore.toFixed(1)}</p>
+                      </div>
                     </div>
                   ))}
               </div>
@@ -385,9 +539,26 @@ export default function MyTeamPage() {
       {/* Save Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowSaveModal(false)}>
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-          <div className="relative glass-card p-6 w-full max-w-md animate-slide-up" onClick={e => e.stopPropagation()}>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm modal-mobile-backdrop" />
+          <div className="relative glass-card p-6 w-full max-w-md animate-slide-up md:animate-scale-in modal-mobile" onClick={e => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-white mb-4">팀 저장</h3>
+
+            {/* 팀 요약 */}
+            <div className="bg-zinc-800/50 rounded-lg p-3 mb-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-zinc-400">포메이션</span>
+                <span className="text-white">{formation}</span>
+              </div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-zinc-400">총 비용</span>
+                <span className={isOverBudget ? 'text-red-400' : 'text-white'}>{totalCost.toFixed(1)}M</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-400">예상 총점</span>
+                <span className="text-gold-400 font-bold">{totalScore.toFixed(1)}</span>
+              </div>
+            </div>
+
             <input
               type="text"
               placeholder="팀 이름 입력..."
@@ -397,10 +568,10 @@ export default function MyTeamPage() {
               autoFocus
             />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowSaveModal(false)} className="btn-secondary">
+              <button onClick={() => setShowSaveModal(false)} className="btn-secondary touch-target">
                 취소
               </button>
-              <button onClick={handleSaveTeam} disabled={!teamName.trim()} className="btn-primary disabled:opacity-50">
+              <button onClick={handleSaveTeam} disabled={!teamName.trim()} className="btn-primary disabled:opacity-50 touch-target">
                 저장
               </button>
             </div>
@@ -411,17 +582,17 @@ export default function MyTeamPage() {
       {/* Load Modal */}
       {showLoadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowLoadModal(false)}>
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-          <div className="relative glass-card p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto animate-slide-up" onClick={e => e.stopPropagation()}>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm modal-mobile-backdrop" />
+          <div className="relative glass-card p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto animate-slide-up md:animate-scale-in modal-mobile" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white">저장된 팀</h3>
-              <button onClick={() => setShowLoadModal(false)} className="text-zinc-400 hover:text-white">
+              <button onClick={() => setShowLoadModal(false)} className="text-zinc-400 hover:text-white touch-target">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="space-y-3">
               {savedTeams.map(team => (
-                <div key={team.id} className="bg-zinc-800 rounded-lg p-4">
+                <div key={team.id} className="bg-zinc-800 rounded-lg p-4 card-interactive">
                   <div className="flex items-center justify-between mb-2">
                     <div>
                       <h4 className="font-bold text-white">{team.name}</h4>
@@ -434,13 +605,13 @@ export default function MyTeamPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleLoadTeam(team)}
-                      className="flex-1 btn-primary text-sm py-2"
+                      className="flex-1 btn-primary text-sm py-2 touch-target"
                     >
                       불러오기
                     </button>
                     <button
                       onClick={() => handleDeleteTeam(team.id)}
-                      className="p-2 bg-zinc-700 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 rounded-lg transition-colors"
+                      className="p-2 bg-zinc-700 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 rounded-lg transition-colors touch-target"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -461,11 +632,13 @@ function SlotButton({
   player,
   onAdd,
   onRemove,
+  showPrice = false,
 }: {
   slot: { id: string; group: string };
   player: Player | null | undefined;
   onAdd: () => void;
   onRemove: () => void;
+  showPrice?: boolean;
 }) {
   const groupColors: Record<string, string> = {
     GK: 'border-green-500 bg-green-500/10',
@@ -475,24 +648,37 @@ function SlotButton({
   };
 
   if (player) {
+    const isUnavailable = player.availability?.status !== 'available' && player.availability?.status !== undefined;
+
     return (
-      <div className={`relative formation-slot filled ${groupColors[slot.group]}`}>
+      <div className={`relative formation-slot filled ${groupColors[slot.group]} ${isUnavailable ? 'opacity-60' : ''}`}>
         <div className="text-center">
           <p className="text-xs font-bold text-white truncate max-w-[60px]">{player.name}</p>
           <p className="text-[10px] text-amber-400">{player.predictedScore.toFixed(1)}</p>
+          {showPrice && player.price && (
+            <p className="text-[9px] text-zinc-400">{player.price.toFixed(1)}M</p>
+          )}
         </div>
         <button
           onClick={onRemove}
-          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-400"
+          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-400 touch-target"
+          style={{ minWidth: '20px', minHeight: '20px' }}
         >
           <X className="w-3 h-3 text-white" />
         </button>
+        {isUnavailable && (
+          <div
+            className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+            style={{ backgroundColor: getAvailabilityColor(player.availability!.status) }}
+            title={getAvailabilityLabel(player.availability!.status)}
+          />
+        )}
       </div>
     );
   }
 
   return (
-    <button onClick={onAdd} className={`formation-slot ${groupColors[slot.group]}`}>
+    <button onClick={onAdd} className={`formation-slot ${groupColors[slot.group]} touch-target`}>
       <Plus className="w-6 h-6 text-zinc-400" />
     </button>
   );

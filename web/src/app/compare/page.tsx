@@ -162,11 +162,11 @@ export default function ComparePage() {
       </div>
 
       {/* Player Selection */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {/* Player 1 */}
         <div className="relative">
           {player1 ? (
-            <div className="glass-card p-6 border-l-4 border-amber-500">
+            <div className="glass-card p-4 sm:p-6 border-l-4 border-amber-500">
               <button
                 onClick={() => setPlayer1(null)}
                 className="absolute top-4 right-4 p-1 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white"
@@ -206,7 +206,7 @@ export default function ComparePage() {
         {/* Player 2 */}
         <div className="relative">
           {player2 ? (
-            <div className="glass-card p-6 border-l-4 border-blue-500">
+            <div className="glass-card p-4 sm:p-6 border-l-4 border-blue-500">
               <button
                 onClick={() => setPlayer2(null)}
                 className="absolute top-4 right-4 p-1 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white"
@@ -298,12 +298,12 @@ export default function ComparePage() {
       {player1 && player2 && (
         <div className="space-y-6">
           {/* Radar Chart */}
-          <div className="glass-card p-6">
+          <div className="glass-card p-4 sm:p-6">
             <h3 className="font-bold text-white mb-4 flex items-center gap-2">
               <Target className="w-5 h-5 text-amber-400" />
               능력치 비교
             </h3>
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={300} className="sm:!h-[400px]">
               <RadarChart data={radarData}>
                 <PolarGrid stroke="#3F3F46" />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#A1A1AA', fontSize: 12 }} />

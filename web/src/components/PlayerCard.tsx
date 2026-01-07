@@ -1,25 +1,15 @@
 'use client';
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-
-interface Player {
-  id: number;
-  name: string;
-  team: string;
-  position: string;
-  predictedScore: number;
-  recentAvg: number;
-  seasonAvg: number;
-  formIndex: number;
-  matchesPlayed: number;
-  totalGoals: number;
-  totalAssists: number;
-  rank?: number;
-}
+import { Player, PlayerAvailability, getAvailabilityColor } from '@/types';
+import { AvailabilityIcon } from './AvailabilityBadge';
+import { PriceTag } from './ValueRatingBadge';
 
 interface PlayerCardProps {
-  player: Player;
+  player: Player & { rank?: number };
   showRank?: boolean;
+  showPrice?: boolean;
+  showAvailability?: boolean;
   onClick?: () => void;
 }
 
@@ -36,12 +26,30 @@ const getTrendIcon = (formIndex: number) => {
   return <Minus className="w-4 h-4 text-zinc-500" />;
 };
 
-export default function PlayerCard({ player, showRank = false, onClick }: PlayerCardProps) {
+export default function PlayerCard({
+  player,
+  showRank = false,
+  showPrice = true,
+  showAvailability = true,
+  onClick
+}: PlayerCardProps) {
+  const isUnavailable = player.availability && player.availability.status !== 'available';
+
   return (
     <div
-      className="player-card p-4 cursor-pointer"
+      className={`player-card p-4 cursor-pointer relative ${isUnavailable ? 'opacity-80' : ''}`}
       onClick={onClick}
     >
+      {/* 출전 상태 아이콘 (우상단) */}
+      {showAvailability && player.availability && player.availability.status !== 'available' && (
+        <div
+          className="absolute top-2 right-2 z-10"
+          title={player.availability.reason || '출전 불확실'}
+        >
+          <AvailabilityIcon availability={player.availability} size="md" />
+        </div>
+      )}
+
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {showRank && player.rank && (
@@ -82,9 +90,15 @@ export default function PlayerCard({ player, showRank = false, onClick }: Player
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm text-zinc-500">
-          <span>{player.totalGoals}G</span>
-          <span>{player.totalAssists}A</span>
-          <span>{player.matchesPlayed}경기</span>
+          {showPrice && player.price !== undefined ? (
+            <PriceTag price={player.price} priceChange={player.priceChange} size="sm" />
+          ) : (
+            <>
+              <span>{player.totalGoals}G</span>
+              <span>{player.totalAssists}A</span>
+              <span>{player.matchesPlayed}경기</span>
+            </>
+          )}
         </div>
       </div>
     </div>

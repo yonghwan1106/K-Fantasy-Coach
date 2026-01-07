@@ -1,0 +1,174 @@
+{
+  "teamMatchups": {
+    "울산 HD": {
+      "teamId": "ulsan",
+      "teamName": "울산 HD",
+      "attackRating": 4.5,
+      "defenseRating": 4.2,
+      "homeAdvantage": 1.15,
+      "form": 4.5,
+      "weakAgainst": ["전북 현대 모터스", "포항 스틸러스"],
+      "strongAgainst": ["대구FC", "수원FC", "대전 시티즌"]
+    },
+    "전북 현대 모터스": {
+      "teamId": "jeonbuk",
+      "teamName": "전북 현대 모터스",
+      "attackRating": 4.3,
+      "defenseRating": 4.0,
+      "homeAdvantage": 1.2,
+      "form": 4.0,
+      "weakAgainst": ["울산 HD", "FC서울"],
+      "strongAgainst": ["광주FC", "대전 시티즌", "김천 상무"]
+    },
+    "FC서울": {
+      "teamId": "seoul",
+      "teamName": "FC서울",
+      "attackRating": 4.0,
+      "defenseRating": 3.8,
+      "homeAdvantage": 1.18,
+      "form": 3.8,
+      "weakAgainst": ["울산 HD", "전북 현대 모터스"],
+      "strongAgainst": ["제주 유나이티드", "대전 시티즌", "수원FC"]
+    },
+    "포항 스틸러스": {
+      "teamId": "pohang",
+      "teamName": "포항 스틸러스",
+      "attackRating": 3.8,
+      "defenseRating": 3.7,
+      "homeAdvantage": 1.12,
+      "form": 3.5,
+      "weakAgainst": ["울산 HD", "전북 현대 모터스"],
+      "strongAgainst": ["강원FC", "광주FC"]
+    },
+    "인천 유나이티드": {
+      "teamId": "incheon",
+      "teamName": "인천 유나이티드",
+      "attackRating": 3.5,
+      "defenseRating": 3.8,
+      "homeAdvantage": 1.1,
+      "form": 4.0,
+      "weakAgainst": ["울산 HD", "FC서울"],
+      "strongAgainst": ["대구FC", "대전 시티즌"]
+    },
+    "대구FC": {
+      "teamId": "daegu",
+      "teamName": "대구FC",
+      "attackRating": 3.2,
+      "defenseRating": 3.0,
+      "homeAdvantage": 1.08,
+      "form": 2.5,
+      "weakAgainst": ["울산 HD", "전북 현대 모터스", "인천 유나이티드"],
+      "strongAgainst": ["수원FC"]
+    },
+    "강원FC": {
+      "teamId": "gangwon",
+      "teamName": "강원FC",
+      "attackRating": 3.3,
+      "defenseRating": 3.2,
+      "homeAdvantage": 1.15,
+      "form": 3.0,
+      "weakAgainst": ["포항 스틸러스", "FC서울"],
+      "strongAgainst": ["광주FC", "대전 시티즌"]
+    },
+    "광주FC": {
+      "teamId": "gwangju",
+      "teamName": "광주FC",
+      "attackRating": 3.0,
+      "defenseRating": 2.8,
+      "homeAdvantage": 1.1,
+      "form": 2.8,
+      "weakAgainst": ["전북 현대 모터스", "포항 스틸러스", "강원FC"],
+      "strongAgainst": ["대전 시티즌"]
+    },
+    "제주 유나이티드": {
+      "teamId": "jeju",
+      "teamName": "제주 유나이티드",
+      "attackRating": 3.2,
+      "defenseRating": 3.0,
+      "homeAdvantage": 1.12,
+      "form": 3.2,
+      "weakAgainst": ["FC서울", "울산 HD"],
+      "strongAgainst": ["김천 상무", "대전 시티즌"]
+    },
+    "대전 시티즌": {
+      "teamId": "daejeon",
+      "teamName": "대전 시티즌",
+      "attackRating": 2.8,
+      "defenseRating": 2.5,
+      "homeAdvantage": 1.08,
+      "form": 2.2,
+      "weakAgainst": ["울산 HD", "전북 현대 모터스", "FC서울", "인천 유나이티드", "강원FC", "제주 유나이티드"],
+      "strongAgainst": []
+    },
+    "수원FC": {
+      "teamId": "suwonfc",
+      "teamName": "수원FC",
+      "attackRating": 2.8,
+      "defenseRating": 2.8,
+      "homeAdvantage": 1.05,
+      "form": 2.5,
+      "weakAgainst": ["울산 HD", "FC서울"],
+      "strongAgainst": ["대전 시티즌"]
+    },
+    "김천 상무": {
+      "teamId": "gimcheon",
+      "teamName": "김천 상무",
+      "attackRating": 3.0,
+      "defenseRating": 3.2,
+      "homeAdvantage": 1.1,
+      "form": 3.0,
+      "weakAgainst": ["전북 현대 모터스", "제주 유나이티드"],
+      "strongAgainst": ["대전 시티즌", "수원FC"]
+    }
+  },
+  "headToHead": {
+    "울산 HD_vs_FC서울": {
+      "team1": "울산 HD",
+      "team2": "FC서울",
+      "last5": [3, 1, 1],
+      "avgTeam1Goals": 1.8,
+      "avgTeam2Goals": 1.0,
+      "lastMeetingDate": "2024-07-20"
+    },
+    "전북 현대 모터스_vs_포항 스틸러스": {
+      "team1": "전북 현대 모터스",
+      "team2": "포항 스틸러스",
+      "last5": [2, 2, 1],
+      "avgTeam1Goals": 1.6,
+      "avgTeam2Goals": 1.2,
+      "lastMeetingDate": "2024-08-03"
+    },
+    "인천 유나이티드_vs_대구FC": {
+      "team1": "인천 유나이티드",
+      "team2": "대구FC",
+      "last5": [3, 1, 1],
+      "avgTeam1Goals": 2.0,
+      "avgTeam2Goals": 0.8,
+      "lastMeetingDate": "2024-07-27"
+    },
+    "강원FC_vs_광주FC": {
+      "team1": "강원FC",
+      "team2": "광주FC",
+      "last5": [2, 2, 1],
+      "avgTeam1Goals": 1.4,
+      "avgTeam2Goals": 1.0,
+      "lastMeetingDate": "2024-08-10"
+    },
+    "제주 유나이티드_vs_대전 시티즌": {
+      "team1": "제주 유나이티드",
+      "team2": "대전 시티즌",
+      "last5": [4, 0, 1],
+      "avgTeam1Goals": 2.2,
+      "avgTeam2Goals": 0.6,
+      "lastMeetingDate": "2024-07-13"
+    },
+    "수원FC_vs_김천 상무": {
+      "team1": "수원FC",
+      "team2": "김천 상무",
+      "last5": [1, 2, 2],
+      "avgTeam1Goals": 1.0,
+      "avgTeam2Goals": 1.4,
+      "lastMeetingDate": "2024-08-17"
+    }
+  }
+}

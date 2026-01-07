@@ -1,0 +1,239 @@
+{
+  "currentRound": 28,
+  "rounds": [
+    {
+      "round": 28,
+      "date": "2024-09-14",
+      "matches": [
+        {
+          "id": "R28-1",
+          "round": 28,
+          "home": "울산 HD",
+          "away": "FC서울",
+          "homeRating": 4.5,
+          "awayRating": 4.0,
+          "kickoff": "16:00",
+          "date": "2024-09-14",
+          "venue": "울산문수축구경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R28-2",
+          "round": 28,
+          "home": "전북 현대 모터스",
+          "away": "포항 스틸러스",
+          "homeRating": 4.3,
+          "awayRating": 3.8,
+          "kickoff": "19:00",
+          "date": "2024-09-14",
+          "venue": "전주월드컵경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R28-3",
+          "round": 28,
+          "home": "인천 유나이티드",
+          "away": "대구FC",
+          "homeRating": 3.5,
+          "awayRating": 3.2,
+          "kickoff": "16:00",
+          "date": "2024-09-15",
+          "venue": "인천축구전용경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R28-4",
+          "round": 28,
+          "home": "강원FC",
+          "away": "광주FC",
+          "homeRating": 3.3,
+          "awayRating": 3.0,
+          "kickoff": "16:00",
+          "date": "2024-09-15",
+          "venue": "춘천송암스포츠타운",
+          "status": "scheduled"
+        },
+        {
+          "id": "R28-5",
+          "round": 28,
+          "home": "제주 유나이티드",
+          "away": "대전 시티즌",
+          "homeRating": 3.2,
+          "awayRating": 2.8,
+          "kickoff": "19:00",
+          "date": "2024-09-15",
+          "venue": "제주월드컵경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R28-6",
+          "round": 28,
+          "home": "수원FC",
+          "away": "김천 상무",
+          "homeRating": 2.8,
+          "awayRating": 3.0,
+          "kickoff": "16:00",
+          "date": "2024-09-14",
+          "venue": "수원종합운동장",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "round": 29,
+      "date": "2024-09-21",
+      "matches": [
+        {
+          "id": "R29-1",
+          "round": 29,
+          "home": "FC서울",
+          "away": "전북 현대 모터스",
+          "homeRating": 4.0,
+          "awayRating": 4.3,
+          "kickoff": "19:30",
+          "date": "2024-09-21",
+          "venue": "서울월드컵경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R29-2",
+          "round": 29,
+          "home": "포항 스틸러스",
+          "away": "울산 HD",
+          "homeRating": 3.8,
+          "awayRating": 4.5,
+          "kickoff": "16:00",
+          "date": "2024-09-21",
+          "venue": "포항스틸야드",
+          "status": "scheduled"
+        },
+        {
+          "id": "R29-3",
+          "round": 29,
+          "home": "대구FC",
+          "away": "강원FC",
+          "homeRating": 3.2,
+          "awayRating": 3.3,
+          "kickoff": "16:00",
+          "date": "2024-09-22",
+          "venue": "대구스타디움",
+          "status": "scheduled"
+        },
+        {
+          "id": "R29-4",
+          "round": 29,
+          "home": "광주FC",
+          "away": "인천 유나이티드",
+          "homeRating": 3.0,
+          "awayRating": 3.5,
+          "kickoff": "16:00",
+          "date": "2024-09-22",
+          "venue": "광주축구전용구장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R29-5",
+          "round": 29,
+          "home": "대전 시티즌",
+          "away": "수원FC",
+          "homeRating": 2.8,
+          "awayRating": 2.8,
+          "kickoff": "19:00",
+          "date": "2024-09-22",
+          "venue": "대전월드컵경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R29-6",
+          "round": 29,
+          "home": "김천 상무",
+          "away": "제주 유나이티드",
+          "homeRating": 3.0,
+          "awayRating": 3.2,
+          "kickoff": "16:00",
+          "date": "2024-09-21",
+          "venue": "김천종합운동장",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "round": 30,
+      "date": "2024-09-28",
+      "matches": [
+        {
+          "id": "R30-1",
+          "round": 30,
+          "home": "울산 HD",
+          "away": "인천 유나이티드",
+          "homeRating": 4.5,
+          "awayRating": 3.5,
+          "kickoff": "16:00",
+          "date": "2024-09-28",
+          "venue": "울산문수축구경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R30-2",
+          "round": 30,
+          "home": "전북 현대 모터스",
+          "away": "대구FC",
+          "homeRating": 4.3,
+          "awayRating": 3.2,
+          "kickoff": "19:00",
+          "date": "2024-09-28",
+          "venue": "전주월드컵경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R30-3",
+          "round": 30,
+          "home": "FC서울",
+          "away": "강원FC",
+          "homeRating": 4.0,
+          "awayRating": 3.3,
+          "kickoff": "19:30",
+          "date": "2024-09-29",
+          "venue": "서울월드컵경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R30-4",
+          "round": 30,
+          "home": "포항 스틸러스",
+          "away": "광주FC",
+          "homeRating": 3.8,
+          "awayRating": 3.0,
+          "kickoff": "16:00",
+          "date": "2024-09-29",
+          "venue": "포항스틸야드",
+          "status": "scheduled"
+        },
+        {
+          "id": "R30-5",
+          "round": 30,
+          "home": "제주 유나이티드",
+          "away": "김천 상무",
+          "homeRating": 3.2,
+          "awayRating": 3.0,
+          "kickoff": "16:00",
+          "date": "2024-09-28",
+          "venue": "제주월드컵경기장",
+          "status": "scheduled"
+        },
+        {
+          "id": "R30-6",
+          "round": 30,
+          "home": "수원FC",
+          "away": "대전 시티즌",
+          "homeRating": 2.8,
+          "awayRating": 2.8,
+          "kickoff": "16:00",
+          "date": "2024-09-29",
+          "venue": "수원종합운동장",
+          "status": "scheduled"
+        }
+      ]
+    }
+  ]
+}

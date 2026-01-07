@@ -290,8 +290,8 @@ input:focus, select:focus {
 
 /* Team Builder */
 .formation-slot {
-  width: 70px;
-  height: 70px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--bg-card);
   border: 2px dashed var(--border-accent);
@@ -300,6 +300,13 @@ input:focus, select:focus {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .formation-slot {
+    width: 70px;
+    height: 70px;
+  }
 }
 
 .formation-slot:hover {
@@ -326,4 +333,377 @@ input:focus, select:focus {
   background: linear-gradient(90deg, var(--gold-500), var(--orange-500));
   border-radius: 2px;
   transition: width 0.3s ease;
+}
+
+/* ========================================
+   NEW ANIMATIONS - Phase 1
+   ======================================== */
+
+/* Page Enter Animation */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-page-enter {
+  animation: pageEnter 0.4s ease-out forwards;
+}
+
+/* Count Up Number Animation */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-count-up {
+  animation: countUp 0.6s ease-out forwards;
+}
+
+/* Chart Grow Animation */
+@keyframes chartGrow {
+  from {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+.animate-chart-grow {
+  animation: chartGrow 0.8s ease-out forwards;
+}
+
+/* Card Hover Micro-interactions Enhanced */
+.card-interactive {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(245, 158, 11, 0.2);
+}
+
+.card-interactive:active {
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* Stagger Animation for Lists */
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-item {
+  opacity: 0;
+}
+
+.stagger-item.visible {
+  animation: staggerFadeIn 0.4s ease-out forwards;
+}
+
+/* Skeleton Shimmer */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(39, 39, 42, 0.5) 0%,
+    rgba(63, 63, 70, 0.5) 50%,
+    rgba(39, 39, 42, 0.5) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* Slide In From Right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out forwards;
+}
+
+/* Bounce In */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.5s ease-out forwards;
+}
+
+/* Progress Bar Animation */
+@keyframes progressFill {
+  from {
+    width: 0;
+  }
+}
+
+.animate-progress {
+  animation: progressFill 1s ease-out forwards;
+}
+
+/* Number Highlight Flash */
+@keyframes numberHighlight {
+  0% {
+    color: var(--text-primary);
+  }
+  50% {
+    color: var(--gold-400);
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+  }
+  100% {
+    color: var(--text-primary);
+  }
+}
+
+.animate-number-highlight {
+  animation: numberHighlight 0.8s ease-out;
+}
+
+/* Ripple Effect for Buttons */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.btn-ripple:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+/* Float Animation for Badges */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Gradient Border Animation */
+@keyframes gradientBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-border {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 12px;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, var(--gold-500), var(--orange-500), var(--gold-500));
+  background-size: 200% 100%;
+  animation: gradientBorder 3s ease infinite;
+  z-index: -1;
+}
+
+/* Availability Status Colors */
+.status-available { color: #22C55E; }
+.status-doubtful { color: #FBBF24; }
+.status-injured { color: #EF4444; }
+.status-suspended { color: #F97316; }
+.status-international { color: #3B82F6; }
+
+.badge-available { background: linear-gradient(135deg, #22C55E, #16A34A); }
+.badge-doubtful { background: linear-gradient(135deg, #FBBF24, #D97706); }
+.badge-injured { background: linear-gradient(135deg, #EF4444, #DC2626); }
+.badge-suspended { background: linear-gradient(135deg, #F97316, #EA580C); }
+.badge-international { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+
+/* Price/Value Colors */
+.price-high { color: #EF4444; }
+.price-medium { color: #FBBF24; }
+.price-low { color: #22C55E; }
+
+.value-excellent { color: #22C55E; }
+.value-good { color: #FBBF24; }
+.value-poor { color: #EF4444; }
+
+/* Difficulty Rating Colors */
+.difficulty-1 { color: #22C55E; } /* Very Easy */
+.difficulty-2 { color: #84CC16; } /* Easy */
+.difficulty-3 { color: #FBBF24; } /* Medium */
+.difficulty-4 { color: #F97316; } /* Hard */
+.difficulty-5 { color: #EF4444; } /* Very Hard */
+
+/* ========================================
+   MOBILE OPTIMIZATIONS - Phase 6
+   ======================================== */
+
+/* Touch Targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Mobile Bottom Sheet */
+@media (max-width: 768px) {
+  .modal-mobile {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    max-height: 85vh;
+    border-radius: 24px 24px 0 0;
+    animation: slideUpMobile 0.3s ease-out forwards;
+  }
+
+  .modal-mobile-backdrop {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+}
+
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Mobile Navigation */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 50;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.mobile-nav-item.active {
+  color: var(--gold-400);
+}
+
+/* Pull to Refresh Indicator */
+@keyframes pullRefresh {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pull-refresh-spinner {
+  animation: pullRefresh 1s linear infinite;
+}
+
+/* Swipe Hint Animation */
+@keyframes swipeHint {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(-10px);
+    opacity: 1;
+  }
+}
+
+.swipe-hint {
+  animation: swipeHint 1.5s ease-in-out infinite;
 }

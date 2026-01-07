@@ -12,7 +12,10 @@ import {
   Target,
   Scale,
   Building2,
-  Clock
+  Clock,
+  Calendar,
+  RefreshCw,
+  Sparkles
 } from 'lucide-react';
 import {
   BarChart,
@@ -26,6 +29,9 @@ import {
 import PlayerCard from '@/components/PlayerCard';
 import PlayerModal from '@/components/PlayerModal';
 import { Player, DarkHorse, Summary } from '@/types';
+import { useCountAnimation } from '@/hooks/useCountAnimation';
+import AnimatedBarChart, { RankBarChart, StackedProgress } from '@/components/charts/AnimatedBarChart';
+import GradientAreaChart from '@/components/charts/GradientAreaChart';
 
 export default function Dashboard() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -36,6 +42,44 @@ export default function Dashboard() {
   // 모달 상태
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 숫자 카운트 애니메이션
+  const animatedTotalPlayers = useCountAnimation(summary?.totalPlayers || 0, { duration: 1000 });
+  const animatedAvgScore = useCountAnimation(summary?.avgPredictedScore || 0, { duration: 1000, decimals: 1 });
+  const animatedRisingCount = useCountAnimation(players.filter(p => p.formIndex > 1.1).length, { duration: 1000 });
+  const animatedDarkHorses = useCountAnimation(summary?.totalDarkHorses || 0, { duration: 1000 });
+
+  // 라운드 카운트다운 (예시: 다음 라운드까지 남은 시간)
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, mins: 0 });
+
+  useEffect(() => {
+    // 예시: 다음 주 토요일 14:00을 다음 라운드로 가정
+    const getNextSaturday = () => {
+      const now = new Date();
+      const daysUntilSat = (6 - now.getDay() + 7) % 7 || 7;
+      const nextSat = new Date(now);
+      nextSat.setDate(now.getDate() + daysUntilSat);
+      nextSat.setHours(14, 0, 0, 0);
+      return nextSat;
+    };
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const target = getNextSaturday();
+      const diff = target.getTime() - now.getTime();
+
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        setCountdown({ days, hours, mins });
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -127,51 +171,86 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Round Countdown Banner */}
+      <div className="glass-card p-4 gradient-gold-soft border border-amber-500/20">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <p className="text-sm text-zinc-400">다음 라운드까지</p>
+              <p className="text-white font-medium">R{summary?.currentRound ? summary.currentRound + 1 : 24} 마감</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-amber-400">{countdown.days}</p>
+              <p className="text-xs text-zinc-500">일</p>
+            </div>
+            <span className="text-zinc-600">:</span>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-amber-400">{countdown.hours}</p>
+              <p className="text-xs text-zinc-500">시간</p>
+            </div>
+            <span className="text-zinc-600">:</span>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-amber-400">{countdown.mins}</p>
+              <p className="text-xs text-zinc-500">분</p>
+            </div>
+          </div>
+          <Link href="/schedule" className="btn-primary text-sm flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            일정 보기
+          </Link>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="glass-card p-4 sm:p-6">
+        <div className="glass-card p-4 sm:p-6 card-interactive">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
             </div>
             <div>
-              <p className="text-xl sm:text-2xl font-bold text-white">{summary?.totalPlayers || 0}</p>
+              <p className="text-xl sm:text-2xl font-bold text-white animate-count-up">{animatedTotalPlayers}</p>
               <p className="text-xs sm:text-sm text-zinc-500">분석 선수</p>
             </div>
           </div>
         </div>
 
-        <div className="glass-card p-4 sm:p-6">
+        <div className="glass-card p-4 sm:p-6 card-interactive">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
               <Target className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
             </div>
             <div>
-              <p className="text-xl sm:text-2xl font-bold text-white">{summary?.avgPredictedScore?.toFixed(1) || 0}</p>
+              <p className="text-xl sm:text-2xl font-bold gradient-text animate-count-up">{animatedAvgScore}</p>
               <p className="text-xs sm:text-sm text-zinc-500">평균 예상 점수</p>
             </div>
           </div>
         </div>
 
-        <div className="glass-card p-4 sm:p-6">
+        <div className="glass-card p-4 sm:p-6 card-interactive">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
             </div>
             <div>
-              <p className="text-xl sm:text-2xl font-bold text-white">{players.filter(p => p.formIndex > 1.1).length}</p>
+              <p className="text-xl sm:text-2xl font-bold text-white animate-count-up">{animatedRisingCount}</p>
               <p className="text-xs sm:text-sm text-zinc-500">급상승 선수</p>
             </div>
           </div>
         </div>
 
-        <div className="glass-card p-4 sm:p-6">
+        <div className="glass-card p-4 sm:p-6 card-interactive">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
               <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
             </div>
             <div>
-              <p className="text-xl sm:text-2xl font-bold text-white">{summary?.totalDarkHorses || 0}</p>
+              <p className="text-xl sm:text-2xl font-bold text-white animate-count-up">{animatedDarkHorses}</p>
               <p className="text-xs sm:text-sm text-zinc-500">다크호스</p>
             </div>
           </div>
@@ -237,27 +316,28 @@ export default function Dashboard() {
 
           {/* 포지션별 차트 */}
           <div className="glass-card p-6">
-            <h3 className="font-bold text-white mb-4">포지션별 평균 예상 점수</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={positionData} layout="vertical">
-                <XAxis type="number" domain={[0, 30]} tick={{ fill: '#71717A', fontSize: 12 }} />
-                <YAxis type="category" dataKey="name" tick={{ fill: '#A1A1AA', fontSize: 12 }} width={40} />
-                <Tooltip
-                  contentStyle={{
-                    background: 'rgba(20, 20, 20, 0.9)',
-                    border: '1px solid rgba(251, 191, 36, 0.2)',
-                    borderRadius: '8px',
-                    color: '#fff'
-                  }}
-                  formatter={(value) => [`${Number(value).toFixed(1)}점`, '평균 점수']}
-                />
-                <Bar dataKey="avg" radius={[0, 4, 4, 0]}>
-                  {positionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              포지션별 평균 예상 점수
+            </h3>
+            <RankBarChart
+              data={positionData.map((p, i) => ({ name: p.name, value: p.avg, color: COLORS[i] }))}
+              showRank={false}
+              maxBars={4}
+            />
+
+            {/* 포지션별 분포 */}
+            <div className="mt-4 pt-4 border-t border-zinc-800">
+              <p className="text-xs text-zinc-500 mb-2">포지션별 선수 분포</p>
+              <StackedProgress
+                segments={positionData.map((p, i) => ({
+                  value: p.count,
+                  color: COLORS[i],
+                  label: p.name,
+                }))}
+                height={8}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -269,30 +349,26 @@ export default function Dashboard() {
             <Building2 className="w-5 h-5 text-amber-400" />
             팀별 평균 예상 점수 TOP 8
           </h3>
-          <Link href="/teams" className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1">
-            전체 보기 <ChevronRight className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-500 flex items-center gap-1">
+              <RefreshCw className="w-3 h-3" /> 실시간
+            </span>
+            <Link href="/teams" className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1">
+              전체 보기 <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={teamChartData}>
-            <XAxis dataKey="name" tick={{ fill: '#A1A1AA', fontSize: 11 }} />
-            <YAxis domain={[0, 20]} tick={{ fill: '#71717A', fontSize: 11 }} />
-            <Tooltip
-              contentStyle={{
-                background: 'rgba(20, 20, 20, 0.95)',
-                border: '1px solid rgba(251, 191, 36, 0.2)',
-                borderRadius: '8px',
-                color: '#fff'
-              }}
-              formatter={(value, name, props) => [`${Number(value).toFixed(2)}점`, props.payload.fullName]}
-            />
-            <Bar dataKey="avgScore" radius={[4, 4, 0, 0]}>
-              {teamChartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={TEAM_COLORS[index % TEAM_COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <AnimatedBarChart
+          data={teamChartData.map((t, i) => ({
+            name: t.name,
+            value: t.avgScore,
+            color: TEAM_COLORS[i % TEAM_COLORS.length],
+          }))}
+          height={250}
+          showLabels
+          labelPosition="top"
+          animationDuration={1200}
+        />
       </div>
 
       {/* Quick Actions */}

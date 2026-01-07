@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Users } from 'lucide-react';
+import { Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Users, DollarSign } from 'lucide-react';
 import PlayerCard from '@/components/PlayerCard';
 import PlayerModal from '@/components/PlayerModal';
-import { Player, K_LEAGUE_TEAMS } from '@/types';
+import { AvailableOnlyToggle } from '@/components/AvailabilityFilter';
+import { Player, K_LEAGUE_TEAMS, AvailabilityStatus } from '@/types';
+import { enrichPlayersData } from '@/lib/dataEnricher';
+import { SkeletonPlayerCard } from '@/components/SkeletonLoader';
 
 const POSITIONS = ['전체', 'GK', 'CB', 'LB', 'RB', 'DMF', 'CMF', 'AMF', 'CF', 'LWF', 'RWF', 'LW', 'RW', 'SS'];
 const ITEMS_PER_PAGE = 20;
@@ -15,9 +18,10 @@ export default function PlayersPage() {
   const [search, setSearch] = useState('');
   const [positionFilter, setPositionFilter] = useState('전체');
   const [teamFilter, setTeamFilter] = useState('전체');
-  const [sortBy, setSortBy] = useState<'predictedScore' | 'recentAvg' | 'seasonAvg' | 'formIndex'>('predictedScore');
+  const [sortBy, setSortBy] = useState<'predictedScore' | 'recentAvg' | 'seasonAvg' | 'formIndex' | 'price' | 'valueRating'>('predictedScore');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [availableOnly, setAvailableOnly] = useState(false);
 
   // 모달 상태
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -27,7 +31,9 @@ export default function PlayersPage() {
     fetch('/data/players.json')
       .then(r => r.json())
       .then(data => {
-        setPlayers(data);
+        // 선수 데이터 보강 (가격, 출전정보 등)
+        const enrichedPlayers = enrichPlayersData(Array.isArray(data) ? data : data.players || []);
+        setPlayers(enrichedPlayers);
         setLoading(false);
       })
       .catch(err => {
@@ -40,6 +46,11 @@ export default function PlayersPage() {
   const teams = useMemo(() => {
     const teamSet = new Set(players.map(p => p.team));
     return ['전체', ...Array.from(teamSet).sort()];
+  }, [players]);
+
+  // 출전불가 선수 수 계산
+  const unavailableCount = useMemo(() => {
+    return players.filter(p => p.availability && p.availability.status !== 'available').length;
   }, [players]);
 
   const filteredPlayers = useMemo(() => {
@@ -63,14 +74,21 @@ export default function PlayersPage() {
       result = result.filter(p => p.team === teamFilter);
     }
 
+    // 출전가능 필터
+    if (availableOnly) {
+      result = result.filter(p => !p.availability || p.availability.status === 'available');
+    }
+
     // 정렬
     result = [...result].sort((a, b) => {
       const multiplier = sortOrder === 'desc' ? -1 : 1;
-      return (a[sortBy] - b[sortBy]) * multiplier;
+      const aVal = a[sortBy] ?? 0;
+      const bVal = b[sortBy] ?? 0;
+      return ((aVal as number) - (bVal as number)) * multiplier;
     });
 
     return result;
-  }, [players, search, positionFilter, teamFilter, sortBy, sortOrder]);
+  }, [players, search, positionFilter, teamFilter, sortBy, sortOrder, availableOnly]);
 
   // 페이지네이션
   const totalPages = Math.ceil(filteredPlayers.length / ITEMS_PER_PAGE);
@@ -82,7 +100,7 @@ export default function PlayersPage() {
   // 필터 변경 시 1페이지로 리셋
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, positionFilter, teamFilter, sortBy, sortOrder]);
+  }, [search, positionFilter, teamFilter, sortBy, sortOrder, availableOnly]);
 
   const toggleSort = (field: typeof sortBy) => {
     if (sortBy === field) {
@@ -105,8 +123,16 @@ export default function PlayersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="space-y-6 animate-fade-in">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">선수 검색</h1>
+          <p className="text-zinc-400">K리그 전체 선수의 판타지 점수를 확인하세요</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <SkeletonPlayerCard key={i} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -164,12 +190,14 @@ export default function PlayersPage() {
         </div>
 
         {/* Sort Buttons */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {[
             { key: 'predictedScore', label: '예상점수' },
             { key: 'recentAvg', label: '최근성적' },
             { key: 'seasonAvg', label: '시즌평균' },
             { key: 'formIndex', label: '폼지수' },
+            { key: 'price', label: '가격' },
+            { key: 'valueRating', label: '가성비' },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -186,6 +214,16 @@ export default function PlayersPage() {
               )}
             </button>
           ))}
+
+          {/* 구분선 */}
+          <div className="w-px h-6 bg-zinc-700 mx-1" />
+
+          {/* 출전가능 필터 */}
+          <AvailableOnlyToggle
+            value={availableOnly}
+            onChange={setAvailableOnly}
+            unavailableCount={unavailableCount}
+          />
         </div>
       </div>
 
